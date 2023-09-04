@@ -41,6 +41,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		[obj writeToFile:@"plane.obj" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+		[obj writeToFile:@"random.obj" atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	}
 }
