@@ -25,9 +25,9 @@ int main(int argc, char *argv[]) {
 					v.push_back([arr[6] doubleValue]);
 				}
 				else if([arr[0] isEqualToString:@"f"]) {
-					f.push_back([arr[1] intValue]);
-					f.push_back([arr[2] intValue]);
-					f.push_back([arr[3] intValue]);
+					f.push_back([arr[1] intValue]-1);
+					f.push_back([arr[2] intValue]-1);
+					f.push_back([arr[3] intValue]-1);
 				}
 			}
 		}
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 			std::vector<int> *tmp = &indices[n];
 			int len = tmp->size();
 			
-			for(int k=0; k<len; k++) {				
+			for(int k=0; k<len; k++) {
 				group[n].push_back((*tmp)[k]);
 			}
 			
@@ -89,7 +89,6 @@ int main(int argc, char *argv[]) {
 					if(face[2]==(*tmp)[k]) target = 2;
 					
 					if(target!=-1) {
-						
 						if(target!=0) group[n].push_back(face[0]);
 						if(target!=1) group[n].push_back(face[1]);
 						if(target!=2) group[n].push_back(face[2]);
@@ -115,7 +114,7 @@ int main(int argc, char *argv[]) {
 			r/=group[n].size();
 			g/=group[n].size();
 			b/=group[n].size();
-		
+			
 			std::vector<int> *tmp = &indices[n];
 			for(int k=0; k<tmp->size(); k++) {
 				v[indices[n][k]*6+3] = r;
