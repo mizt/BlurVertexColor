@@ -5,12 +5,13 @@
 int main(int argc, char *argv[]) {
 	@autoreleasepool {
 		
-		NSString *src = [NSString stringWithContentsOfFile:@"./random.obj" encoding:NSUTF8StringEncoding error:nil];
+		NSString *src = [NSString stringWithContentsOfFile:@"./marge.obj" encoding:NSUTF8StringEncoding error:nil];
 		NSArray *lines = [src componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
 		
 		NSCharacterSet *whitespaces = [NSCharacterSet whitespaceCharacterSet];
 		
 		std::vector<float> v;
+		std::vector<unsigned int> f;
 		
 		for(int k=0; k<[lines count]; k++) {
 			NSArray *arr = [lines[k] componentsSeparatedByCharactersInSet:whitespaces];
@@ -23,11 +24,16 @@ int main(int argc, char *argv[]) {
 					v.push_back([arr[5] doubleValue]);
 					v.push_back([arr[6] doubleValue]);
 				}
+				else if([arr[0] isEqualToString:@"f"]) {
+					f.push_back([arr[1] intValue]);
+					f.push_back([arr[2] intValue]);
+					f.push_back([arr[3] intValue]);
+				}
 			}
 		}
 		
 		unsigned int length = v.size()/6;
-		
+
 		unsigned int *use = new unsigned int[length];
 		for(int n=0; n<length; n++) use[n] = false;
 		std::vector<std::vector<int>> indices;
@@ -54,30 +60,67 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		
+		std::vector<std::vector<int>> group;
 		for(int n=0; n<indices.size(); n++) {
-
+			
+			group.push_back({});
+			
+			std::vector<int> *tmp = &indices[n];
+			int len = tmp->size();
+			
+			for(int k=0; k<len; k++) {				
+				group[n].push_back((*tmp)[k]);
+			}
+			
+			for(int l=0; l<f.size()/3; l++) {
+				
+				unsigned int face[3] = {
+					f[l*3+0],
+					f[l*3+1],
+					f[l*3+2]
+				};
+				
+				for(int k=0; k<len; k++) {
+					
+					int target = -1;
+					
+					if(face[0]==(*tmp)[k]) target = 0;
+					if(face[1]==(*tmp)[k]) target = 1;
+					if(face[2]==(*tmp)[k]) target = 2;
+					
+					if(target!=-1) {
+						
+						if(target!=0) group[n].push_back(face[0]);
+						if(target!=1) group[n].push_back(face[1]);
+						if(target!=2) group[n].push_back(face[2]);
+					}
+				}
+			}
+		}
+	
+		for(int n=0; n<group.size(); n++) {
+			
 			float r = 0;
 			float g = 0;
 			float b = 0;
-
-			for(int k=0; k<indices[n].size(); k++) {
-				unsigned int addr = indices[n][k]*6+3;
-				r+=v[addr+0];
-				g+=v[addr+1];
-				b+=v[addr+2];
+			
+			for(int k=0; k<group[n].size(); k++) {
+				
+				r+=v[group[n][k]*6+3];
+				g+=v[group[n][k]*6+4];
+				b+=v[group[n][k]*6+5];
+			
 			}
 			
-			r/=indices[n].size();
-			g/=indices[n].size();
-			b/=indices[n].size();
-			
-			for(int k=0; k<indices[n].size(); k++) {
-				
-				unsigned int addr = indices[n][k]*6+3;
-				
-				v[addr+0] = r;
-				v[addr+1] = g;
-				v[addr+2] = b;
+			r/=group[n].size();
+			g/=group[n].size();
+			b/=group[n].size();
+		
+			std::vector<int> *tmp = &indices[n];
+			for(int k=0; k<tmp->size(); k++) {
+				v[indices[n][k]*6+3] = r;
+				v[indices[n][k]*6+4] = g;
+				v[indices[n][k]*6+5] = b;
 			}
 		}
 		
@@ -92,6 +135,6 @@ int main(int argc, char *argv[]) {
 			[obj appendString:[NSString stringWithFormat:@"f %d %d %d\n",1+n*6+3,1+n*6+4,1+n*6+5]];
 		} 
 		
-		[obj writeToFile:@"marge.obj" atomically:YES encoding:NSUTF8StringEncoding error:nil];
+		[obj writeToFile:@"blur.obj" atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	}
 }

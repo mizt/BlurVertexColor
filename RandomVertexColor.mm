@@ -2,7 +2,7 @@
 #import <simd/simd.h>
 #import <vector>
 
-inline float frand() { return (random()%256)/255.0; }
+inline float frand() { return 0.5; }//(random()%256)/255.0; }
 
 int main(int argc, char *argv[]) {
 	@autoreleasepool {
